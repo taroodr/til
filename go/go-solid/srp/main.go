@@ -9,6 +9,7 @@ type Working int
 const (
 	Parttime Working = iota // パートタイム
 	Fulltime             // フルタイム
+	Intern               // インターン
 )
 
 func (w Working) String() string {
@@ -17,6 +18,8 @@ func (w Working) String() string {
 		return "パートタイム"
 	case Fulltime:
 		return "フルタイム"
+	case Intern:
+		return "インターン"
 	}
 	return ""
 }
@@ -43,7 +46,7 @@ func (e *Employee) Save(text string) error {
 
 func (e *Employee) regularHours() time.Duration {
 	switch e.WorkingType  {
-	case Parttime:
+	case Parttime, Intern:
 		return 5 * time.Hour
 	}
 	return 8* time.Hour
