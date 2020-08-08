@@ -2,20 +2,51 @@ package main
 
 import "time"
 
+// ENUM
+
+type Working int
+
+const (
+	Parttime Working = iota // パートタイム
+	Fulltime             // フルタイム
+)
+
+func (w Working) String() string {
+	switch w {
+	case Parttime:
+		return "パートタイム"
+	case Fulltime:
+		return "フルタイム"
+	}
+	return ""
+}
+
 // Employee
 
-type Employee struct{}
+type Employee struct{
+	WorkingType Working
+}
 
 func (e *Employee) CalculatePay() int {
+	_ = e.regularHours()
 	return 0
 }
 
 func (e *Employee) ReportHours() time.Duration {
+	_ = e.regularHours()
 	return time.Duration(0)
 }
 
 func (e *Employee) Save(text string) error {
 	return nil
+}
+
+func (e *Employee) regularHours() time.Duration {
+	switch e.WorkingType  {
+	case Parttime:
+		return 5 * time.Hour
+	}
+	return 8* time.Hour
 }
 
 // Actors
@@ -48,7 +79,9 @@ func (a *CFO) Exec() error {
 
 func main() {
 	cto := CTO{
-		Employee: &Employee{},
+		Employee: &Employee{
+			WorkingType: Fulltime,
+		},
 	}
 	cto.Exec("any")
 
