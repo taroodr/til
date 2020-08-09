@@ -30,65 +30,92 @@ type EmployeeData struct {
 	WorkingType Working
 }
 
+type EmployeeFacade struct {
+	saver EmployeeSaver
+	reporter HourReporter
+	calculator PayCalculator
+}
+
+func NewEmployeeFacade() *EmployeeFacade {
+	return &EmployeeFacade{
+		saver: EmployeeSaver{},
+		reporter: HourReporter{},
+		calculator: PayCalculator{},
+	}
+}
+
+func (e *EmployeeFacade) Save(data EmployeeData) error {
+	return e.saver.saveEmployee(data)
+}
+
+func (e *EmployeeFacade) CalculatePay(data EmployeeData) int {
+	return e.calculator.calculatePay(data)
+}
+
+func (e *EmployeeFacade) ReportHours(data EmployeeData) time.Duration {
+	return e.reporter.reportHours(data)
+}
+
 type EmployeeSaver struct {}
 
-func (e *EmployeeSaver) SaveEmployee(data EmployeeData) error {
+func (e *EmployeeSaver) saveEmployee(data EmployeeData) error {
 	return nil
 }
 
 type PayCalculator struct {}
 
-func (e *PayCalculator) CalculatePay(data EmployeeData) int {
+func (e *PayCalculator) calculatePay(data EmployeeData) int {
 	return 0
 }
 
 type HourReporter struct {}
 
-func (e *HourReporter) ReportHours(data EmployeeData) time.Duration {
+func (e *HourReporter) reportHours(data EmployeeData) time.Duration {
 	return time.Duration(0)
 }
 
 // Actors
 
 type CTO struct {
-	EmployeeSaver *EmployeeSaver
+	EmployeeFacade *EmployeeFacade
 }
 
 func (a *CTO) Exec(data EmployeeData)error {
-	return a.EmployeeSaver.SaveEmployee(data)
+	return a.EmployeeFacade.Save(data)
 }
 
 type COO struct {
-	HourReporter *HourReporter
+	EmployeeFacade *EmployeeFacade
 }
 
 func (a *COO) Exec(data EmployeeData) error {
-	_ = a.HourReporter.ReportHours(data)
+	_ = a.EmployeeFacade.ReportHours(data)
 	return nil
 }
 
 type CFO struct {
-	PayCalculator *PayCalculator
+	EmployeeFacade *EmployeeFacade
 }
 
 func (a *CFO) Exec(data EmployeeData) error {
-	_ = a.PayCalculator.CalculatePay(data)
+	_ = a.EmployeeFacade.CalculatePay(data)
 	return nil
 }
 
 func main() {
+	EmployeeFacade := NewEmployeeFacade()
 	cto := CTO{
-		EmployeeSaver: &EmployeeSaver{},
+		EmployeeFacade: EmployeeFacade,
 	}
 	cto.Exec(EmployeeData{WorkingType: Fulltime})
 
 	coo := COO{
-		HourReporter: &HourReporter{},
+		EmployeeFacade: EmployeeFacade,
 	}
 	coo.Exec(EmployeeData{WorkingType: Parttime})
 
 	cfo := CFO{
-		PayCalculator: &PayCalculator{},
+		EmployeeFacade: EmployeeFacade,
 	}
 	cfo.Exec(EmployeeData{WorkingType: Intern})
 }
