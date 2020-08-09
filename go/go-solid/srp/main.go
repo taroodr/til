@@ -26,75 +26,69 @@ func (w Working) String() string {
 
 // Employee
 
-type Employee struct{
+type EmployeeData struct {
 	WorkingType Working
 }
 
-func (e *Employee) CalculatePay() int {
-	_ = e.regularHours()
-	return 0
-}
+type EmployeeSaver struct {}
 
-func (e *Employee) ReportHours() time.Duration {
-	_ = e.regularHours()
-	return time.Duration(0)
-}
-
-func (e *Employee) Save(text string) error {
+func (e *EmployeeSaver) SaveEmployee(data EmployeeData) error {
 	return nil
 }
 
-func (e *Employee) regularHours() time.Duration {
-	switch e.WorkingType  {
-	case Parttime, Intern:
-		return 5 * time.Hour
-	}
-	return 8* time.Hour
+type PayCalculator struct {}
+
+func (e *PayCalculator) CalculatePay(data EmployeeData) int {
+	return 0
+}
+
+type HourReporter struct {}
+
+func (e *HourReporter) ReportHours(data EmployeeData) time.Duration {
+	return time.Duration(0)
 }
 
 // Actors
 
 type CTO struct {
-	Employee *Employee
+	EmployeeSaver *EmployeeSaver
 }
 
-func (a *CTO) Exec(text string)error {
-	return a.Employee.Save(text)
+func (a *CTO) Exec(data EmployeeData)error {
+	return a.EmployeeSaver.SaveEmployee(data)
 }
 
 type COO struct {
-	Employee *Employee
+	HourReporter *HourReporter
 }
 
-func (a *COO) Exec() error {
-	_ = a.Employee.ReportHours()
+func (a *COO) Exec(data EmployeeData) error {
+	_ = a.HourReporter.ReportHours(data)
 	return nil
 }
 
 type CFO struct {
-	Employee *Employee
+	PayCalculator *PayCalculator
 }
 
-func (a *CFO) Exec() error {
-	_ = a.Employee.CalculatePay()
+func (a *CFO) Exec(data EmployeeData) error {
+	_ = a.PayCalculator.CalculatePay(data)
 	return nil
 }
 
 func main() {
 	cto := CTO{
-		Employee: &Employee{
-			WorkingType: Fulltime,
-		},
+		EmployeeSaver: &EmployeeSaver{},
 	}
-	cto.Exec("any")
+	cto.Exec(EmployeeData{WorkingType: Fulltime})
 
 	coo := COO{
-		Employee: &Employee{},
+		HourReporter: &HourReporter{},
 	}
-	coo.Exec()
+	coo.Exec(EmployeeData{WorkingType: Parttime})
 
 	cfo := CFO{
-		Employee: &Employee{},
+		PayCalculator: &PayCalculator{},
 	}
-	cfo.Exec()
+	cfo.Exec(EmployeeData{WorkingType: Intern})
 }
