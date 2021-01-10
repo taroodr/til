@@ -5,15 +5,20 @@ import Post, { PostProps } from "../components/Post"
 import prisma from '../lib/prisma'
 
 export const getStaticProps: GetStaticProps = async () => {
-  const feed = await prisma.post.findMany({
-    where: {published: true},
-    include: {
-      author: {
-        select: { name: true },
+  try {
+    const feed = await prisma.post.findMany({
+      where: {published: true},
+      include: {
+        author: {
+          select: { name: true },
+        },
       },
-    },
-  })
-  return { props: { feed } }
+    })
+    return { props: { feed } }
+  } catch {
+    return { props: { feed: [] }}
+  }
+  
 }
 
 type Props = {
